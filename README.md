@@ -406,11 +406,8 @@ ON e.branch_id = b.branch_id
 GROUP BY 1, 2
 ```
 
-**Task 18: Identify Members Issuing High-Risk Books**  
-Write a query to identify members who have issued books more than twice with the status "damaged" in the books table. Display the member name, book title, and the number of times they've issued damaged books.    
 
-
-**Task 19: Stored Procedure**
+**Task 18: Stored Procedure**
 Objective:
 Create a stored procedure to manage the status of books in a library system.
 Description:
@@ -475,7 +472,7 @@ WHERE isbn = '978-0-375-41398-8'
 
 
 
-**Task 20: Create Table As Select (CTAS)**
+**Task 19: Create Table As Select (CTAS)**
 Objective: Create a CTAS (Create Table As Select) query to identify overdue books and calculate fines.
 
 Description: Write a CTAS query to create a new table that lists each member and the books they have issued but not returned within 30 days. The table should include:
@@ -487,6 +484,27 @@ Description: Write a CTAS query to create a new table that lists each member and
     Number of overdue books
     Total fines
 
+
+```sql
+CREATE TABLE member_fines
+AS
+SELECT 
+	m.member_name,
+	count (ist.issued_id) as books_overdue,
+	sum(CURRENT_DATE - ist.issued_date) as total_days_overdue,
+	sum(CURRENT_DATE - ist.issued_date) * 0.5 as fines
+from issued_status as ist
+LEFT JOIN 
+return_status as rst
+ON rst.issued_id = ist.issued_id
+JOIN
+members	as m
+ON m.member_id = ist.issued_member_id
+WHERE rst.return_id is Null
+group by 1;
+
+select * from member_fines;
+```
 
 
 ## Reports
